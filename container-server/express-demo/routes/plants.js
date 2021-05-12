@@ -10,6 +10,7 @@ router.get('/', verifyToken, async (req, res) => {
 
     try {
         const plants = await Plant.find();
+        console.log('plant test');
         res.send(plants);
     } catch (err) {
         res.status(500).send(err);
