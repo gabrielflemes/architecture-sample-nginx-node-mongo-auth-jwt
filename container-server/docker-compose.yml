@@ -1,0 +1,60 @@
+version: '3' #docker-composer version
+services: #all containers that our app will have
+    ## nginx created from dockfile
+    nginx: #nginx conteiner
+        build:
+            dockerfile: nginx.dockerfile #dockerfile to be executed
+            context: . #root context folder
+        image: gabriellemes/nginx #image
+        container_name: nginx
+        ports:
+            - "80:80" #mapper port local:container
+            #- 124:3000 I can open more ports if I want, (-) to yml is an array
+        networks:
+            - my-network #name of my network created below
+        depends_on: # before this container, mongodb will up first
+            - "api1"
+            - "api2" 
+    
+    ## mongodb created from a default image, in this case oficial mongo
+    mongodb:
+        image: mongo
+        networks: 
+            - my-network
+
+    ## api created from dockfile - these APIs will be replicated for loading balance nginx
+    api1:
+        build: 
+            dockerfile: dockerfile
+            context: .
+        image: gabriellemes/server-plant
+        container_name: server-plant-01
+        ports: 
+            - "3000"
+        networks: 
+            - my-network
+        depends_on: # before this container, mongodb will up first
+            - "mongodb" 
+    api2:
+        build: 
+            dockerfile: dockerfile
+            context: .
+        image: gabriellemes/server-plant
+        container_name: server-plant-02
+        ports: 
+            - "3000"
+        networks: 
+            - my-network
+        depends_on: # before this container, mongodb will up first
+            - "mongodb" 
+
+## create a network called my-newtwork using bridge driver
+networks:
+    my-network:
+        driver: bridge
+
+
+
+### Instructions
+# docker-compose build
+# docker-compose up
