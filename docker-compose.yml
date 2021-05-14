@@ -1,6 +1,6 @@
 version: '3' #docker-composer version
 services: #all containers that our app will have
-    ## nginx created from dockfile
+    ## nginx created from dockfile - Load Balance for api1 and api2
     nginx: #nginx conteiner
         build:
             dockerfile: nginx.dockerfile #dockerfile to be executed
@@ -16,9 +16,23 @@ services: #all containers that our app will have
             - "api1"
             - "api2" 
     
+    ## APP React
+    reactApp:
+        build:
+            dockerfile: react.dockerfile #dockerfile to be executed
+            context: . #root context folder
+        image: gabriellemes/reactapp      
+        container_name: reactapp-container
+        ports:
+            - "9000:9000"
+        networks: 
+            - my-network
+
     ## mongodb created from a default image, in this case oficial mongo
     mongodb:
         image: mongo
+        # volumes: 
+        #     - ./container-client/build:/usr/share/nginx/html
         networks: 
             - my-network
 
@@ -30,7 +44,7 @@ services: #all containers that our app will have
         image: gabriellemes/server-plant
         container_name: server-plant-01
         ports: 
-            - "3000"
+            - "3000" # just one port, because we dont want to access this api outside
         networks: 
             - my-network
         depends_on: # before this container, mongodb will up first
@@ -42,7 +56,7 @@ services: #all containers that our app will have
         image: gabriellemes/server-plant
         container_name: server-plant-02
         ports: 
-            - "3000"
+            - "3000" # just one port, because we dont want to access this api outside
         networks: 
             - my-network
         depends_on: # before this container, mongodb will up first
@@ -59,3 +73,7 @@ networks:
 # docker-compose build
 # docker-compose up (or docker-compose up -d if you want)
 # docker-compose ps
+
+# docker-compose stop 
+# docker-compose start
+# docker-compose up service (up only the indiceted service)

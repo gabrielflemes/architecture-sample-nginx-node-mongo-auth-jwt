@@ -1,5 +1,5 @@
 FROM node:latest
-COPY ./express-demo /var/www
+COPY ./container-server/express-demo /var/www
 WORKDIR /var/www
 RUN npm install nodemon
 RUN npm install
